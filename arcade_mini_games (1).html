@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Mini Games - Penjelajah Pikiran & Mancing Mania</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            50: '#f0f9ff',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                        ocean: {
+                            50: '#f0fdfa',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                        },
+                        arcade: {
+                            purple: '#8b5cf6',
+                            pink: '#ec4899',
+                            yellow: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .shake { animation: shake 0.4s ease-in-out; }
+        .pulse-glow { animation: pulseGlow 2s infinite; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(14, 165, 233, 0.8); }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-cyber-500 selection:text-white">
+
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 shadow-lg">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer group" onclick="backToHome()">
+                <div class="w-10 h-10 bg-gradient-to-tr from-cyber-600 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-cyber-500/20 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-cyber-400 to-indigo-400 bg-clip-text text-transparent">Arcade Arena Pro</h1>
+                    <p class="text-xs text-slate-400">Pusat Game Seru & Menantang</p>
+                </div>
+            </div>
+
+            <!-- Stats Bar (Mind Game) -->
+            <div id="statsBar" class="hidden flex items-center space-x-3 sm:space-x-6 text-sm">
+                <button onclick="backToHome()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg border border-slate-700 transition-colors">
+                    <i class="fa-solid fa-house mr-1"></i> Menu
+                </button>
+                <div class="flex items-center space-x-1.5 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+                    <i class="fa-solid fa-heart text-red-500 animate-pulse"></i>
+                    <span id="statLives" class="font-bold">3</span>
+                </div>
+                <div class="flex items-center space-x-1.5 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+                    <i class="fa-solid fa-star text-amber-400"></i>
+                    <span id="statScore" class="font-bold text-amber-400">0</span>
+                </div>
+            </div>
+
+            <!-- Stats Bar (Fishing Game) -->
+            <div id="fishStatsBar" class="hidden flex items-center space-x-3 sm:space-x-6 text-sm">
+                <button onclick="backToHome()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg border border-slate-700 transition-colors">
+                    <i class="fa-solid fa-house mr-1"></i> Menu
+                </button>
+                <div class="flex items-center space-x-1.5 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+                    <i class="fa-solid fa-fish text-ocean-400"></i>
+                    <span id="statFishCount" class="font-bold text-ocean-300">0 Ekor</span>
+                </div>
+                <div class="flex items-center space-x-1.5 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+                    <i class="fa-solid fa-coins text-amber-400"></i>
+                    <span id="statFishCoins" class="font-bold text-amber-400">Rp 0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div id="gameCard" class="max-w-xl w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden transition-all pulse-glow">
+            
+            <!-- MAIN HOME SELECTION SCREEN -->
+            <div id="screenHome" class="space-y-6 text-center">
+                <div class="w-20 h-20 bg-gradient-to-br from-cyber-500/20 to-arcade-purple/20 border border-cyber-500/30 text-cyber-400 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-inner animate-bounce">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <div class="space-y-2">
+                    <span class="inline-block px-3.5 py-1 bg-cyber-500/10 text-cyber-400 rounded-full text-xs font-bold tracking-wider uppercase border border-cyber-500/30">
+                        <i class="fa-solid fa-sparkles mr-1"></i> Pilih Mode Permainanmu
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                        Mau Main Apa Hari Ini?
+                    </h2>
+                    <p class="text-slate-400 text-sm max-w-md mx-auto">
+                        Nikmati pengalaman arcade seru dengan grafis modern, efek animasi dinamis, dan tantangan yang menguji kemampuanmu!
+                    </p>
+                </div>
+
+                <!-- Game Choices Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <!-- Option 1: Mind Game -->
+                    <div onclick="startMindGameMenu()" class="bg-slate-950/80 hover:bg-slate-950 border border-slate-800 hover:border-cyber-500 p-5 rounded-2xl cursor-pointer transition-all group text-left space-y-3 flex flex-col justify-between shadow-lg">
+                        <div class="w-12 h-12 bg-cyber-500/10 text-cyber-400 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 group-hover:rotate-6 transition-transform">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white group-hover:text-cyber-400 transition-colors">Penjelajah Pikiran</h3>
+                            <p class="text-xs text-slate-400 mt-1">Uji logika kilat, teka-teki logika, & asah otak tingkat lanjut.</p>
+                        </div>
+                        <div class="flex items-center text-xs font-semibold text-cyber-400 pt-2">
+                            <span>Mainkan Sekarang</span>
+                            <i class="fa-solid fa-arrow-right ml-1.5 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Option 2: Fishing Game -->
+                    <div onclick="startFishingGame()" class="bg-slate-950/80 hover:bg-slate-950 border border-slate-800 hover:border-ocean-500 p-5 rounded-2xl cursor-pointer transition-all group text-left space-y-3 flex flex-col justify-between shadow-lg">
+                        <div class="w-12 h-12 bg-ocean-500/10 text-ocean-400 rounded-xl flex items-center justify-center text-xl group-hover:scale-110 group-hover:-rotate-6 transition-transform">
+                            <i class="fa-solid fa-fish-fins"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white group-hover:text-ocean-400 transition-colors">Mancing Mania Pro</h3>
+                            <p class="text-xs text-slate-400 mt-1">Lempar kail, tangkap ikan langka, temukan harta karun & koin!</p>
+                        </div>
+                        <div class="flex items-center text-xs font-semibold text-ocean-400 pt-2">
+                            <span>Mulai Memancing</span>
+                            <i class="fa-solid fa-arrow-right ml-1.5 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="screenMindWelcome" class="hidden space-y-6 text-center">
+                <div class="w-20 h-20 bg-cyber-500/10 border border-cyber-500/30 text-cyber-400 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-inner animate-pulse">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="space-y-3">
+                    <span class="inline-block px-3 py-1 bg-cyber-500/10 text-cyber-400 rounded-full text-xs font-bold tracking-wider uppercase border border-cyber-500/20">
+                        <i class="fa-solid fa-bolt mr-1"></i> Pilih Tingkat Kesulitan
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                        Penjelajah Pikiran Arena
+                    </h2>
+                    <p class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+                        Pilih mode tantangan sesuai kecepatan dan kemampuan analisis otakmu!
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                    <button onclick="launchMindGamePlay('easy')" class="p-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500 rounded-xl text-left transition-all group">
+                        <div class="text-emerald-400 font-bold mb-1"><i class="fa-solid fa-shield-cat mr-1.5"></i> Santai</div>
+                        <p class="text-xs text-slate-400">Waktu lebih panjang, soal santai.</p>
+                    </button>
+                    <button onclick="launchMindGamePlay('normal')" class="p-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-cyber-500 rounded-xl text-left transition-all group">
+                        <div class="text-cyber-400 font-bold mb-1"><i class="fa-solid fa-bolt mr-1.5"></i> Normal</div>
+                        <p class="text-xs text-slate-400">Kecepatan standar, poin seimbang.</p>
+                    </button>
+                    <button onclick="launchMindGamePlay('hard')" class="p-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-pink-500 rounded-xl text-left transition-all group">
+                        <div class="text-pink-400 font-bold mb-1"><i class="fa-solid fa-fire mr-1.5"></i> Hardcore</div>
+                        <p class="text-xs text-slate-400">Waktu kilat, bonus skor ganda!</p>
+                    </button>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="backToHome()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-xs">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Menu
+                    </button>
+                </div>
+            </div>
+
+            <div id="screenMindGame" class="hidden space-y-6">
+                <div class="flex justify-between items-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    <span id="gameModeTitle" class="text-cyber-400 font-bold">Tantangan Logika</span>
+                    <span id="gameProgress" class="bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">Soal 1 dari 8</span>
+                </div>
+
+                <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800 p-0.5">
+                    <div id="timerBar" class="bg-gradient-to-r from-emerald-500 via-cyber-500 to-pink-500 h-full w-full transition-all duration-100 rounded-full"></div>
+                </div>
+
+                <div class="bg-slate-950/80 border border-slate-800 p-6 rounded-2xl space-y-4 text-center shadow-inner">
+                    <div id="categoryBadge" class="inline-block px-3 py-1 bg-cyber-500/10 text-cyber-400 text-xs font-semibold rounded-full border border-cyber-500/20">Logika Otak</div>
+                    <h3 id="questionText" class="text-lg sm:text-xl font-extrabold text-slate-100 min-h-[4.5rem] flex items-center justify-center leading-snug">
+                        Memuat pertanyaan...
+                    </h3>
+                    <div id="gameExtraArea" class="py-1"></div>
+                </div>
+
+                <div id="optionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            </div>
+
+            <div id="screenMindResult" class="hidden space-y-6 text-center">
+                <div id="resultIcon" class="w-20 h-20 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-xl">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="space-y-2">
+                    <h2 id="resultTitle" class="text-2xl sm:text-3xl font-extrabold">Permainan Selesai</h2>
+                    <p id="resultDesc" class="text-slate-400 text-sm">Skor akhir Anda direkap dengan pencapaian hebat.</p>
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl max-w-md mx-auto grid grid-cols-3 gap-2 text-center shadow-inner">
+                    <div>
+                        <p class="text-xs text-slate-400">Total Skor</p>
+                        <p id="finalScore" class="text-xl sm:text-2xl font-extrabold text-amber-400">0</p>
+                    </div>
+                    <div class="border-x border-slate-800">
+                        <p class="text-xs text-slate-400">Streak Max</p>
+                        <p id="finalStreak" class="text-xl sm:text-2xl font-extrabold text-orange-400">0x</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400">Akurasi</p>
+                        <p id="finalAccuracy" class="text-xl sm:text-2xl font-extrabold text-cyber-400">0%</p>
+                    </div>
+                </div>
+                <div class="pt-2 flex flex-col sm:flex-row justify-center gap-3">
+                    <button onclick="startMindGameMenu()" class="px-6 py-3.5 bg-gradient-to-r from-cyber-600 to-indigo-600 hover:from-cyber-500 hover:to-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-cyber-600/30">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> Main Lagi
+                    </button>
+                    <button onclick="backToHome()" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition-all border border-slate-700">
+                        Pilih Game Lain
+                    </button>
+                </div>
+            </div>
+
+            <div id="screenFishingGame" class="hidden space-y-6 text-center">
+                <div class="space-y-1">
+                    <span class="inline-block px-3 py-1 bg-ocean-500/10 text-ocean-400 rounded-full text-xs font-bold tracking-wider uppercase border border-ocean-500/20">
+                        <i class="fa-solid fa-water mr-1"></i> Danau Mancing Mania Pro
+                    </span>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-white">Lempar Kail, Tarik Ikan Legendaris!</h2>
+                </div>
+
+                <!-- Fishing Visual Box -->
+                <div id="fishingVisualBox" class="bg-gradient-to-b from-sky-950/60 via-slate-950 to-ocean-950/80 border border-ocean-500/30 p-8 rounded-2xl relative overflow-hidden min-h-[180px] flex flex-col items-center justify-center space-y-4 shadow-inner">
+                    <div id="fishingAnimationArea" class="text-5xl sm:text-6xl animate-bounce text-ocean-400 filter drop-shadow-md">
+                        <i class="fa-solid fa-fish-fins"></i>
+                    </div>
+                    <p id="fishingStatusText" class="text-sm font-semibold text-slate-300 max-w-sm">
+                        Kail siap dilempar ke air dalam. Klik tombol pancing di bawah untuk mulai beraksi!
+                    </p>
+                </div>
+
+                <!-- Action Button -->
+                <div id="fishingActionArea" class="space-y-3">
+                    <button onclick="castFishingRod()" id="btnCast" class="w-full py-4 bg-gradient-to-r from-ocean-600 to-teal-500 hover:from-ocean-500 hover:to-teal-400 text-white font-extrabold rounded-2xl transition-all shadow-xl shadow-ocean-600/30 text-lg flex items-center justify-center space-x-2 group">
+                        <i class="fa-solid fa-fish-fins group-hover:rotate-12 transition-transform"></i>
+                        <span>Lempar Kail Sekarang!</span>
+                    </button>
+                </div>
+
+                <!-- Recent Catch History / Info -->
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl text-left shadow-inner">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hasil Tangkapan Terakhir:</h4>
+                    <div id="lastCatchInfo" class="text-sm font-medium text-slate-200 flex items-center justify-between">
+                        <span>Belum ada ikan yang tertangkap di kolam.</span>
+                        <span class="text-xs text-slate-500">-</span>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="backToHome()" class="text-xs text-slate-400 hover:text-white underline transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Menu Utama
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="py-4 border-t border-slate-800 bg-slate-900/50 text-center text-xs text-slate-500 space-y-1">
+        <p>&copy; 2026 Arcade Arena Pro. Seru, Interaktif & Menghibur!</p>
+        <p class="text-slate-400">Dibuat oleh <span class="text-cyber-400 font-bold">Sigit Bramantyo</span> • <span class="text-ocean-400 font-bold">SMK Farmasi Cendikia Farma Husada</span> • <span class="text-amber-400 font-bold">Mr.Manty</span></p>
+    </footer>
+
+    <script>
+        // Global navigation / screens
+        function hideAllScreens() {
+            document.getElementById('screenHome').classList.add('hidden');
+            document.getElementById('screenMindWelcome').classList.add('hidden');
+            document.getElementById('screenMindGame').classList.add('hidden');
+            document.getElementById('screenMindResult').classList.add('hidden');
+            document.getElementById('screenFishingGame').classList.add('hidden');
+
+            document.getElementById('statsBar').classList.add('hidden');
+            document.getElementById('fishStatsBar').classList.add('hidden');
+            clearInterval(mindState.timerInterval);
+        }
+
+        function backToHome() {
+            hideAllScreens();
+            document.getElementById('screenHome').classList.remove('hidden');
+        }
+
+        // ================= MIND GAME LOGIC =================
+        let mindState = {
+            lives: 3,
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            currentQuestionIndex: 0,
+            correctCount: 0,
+            questions: [],
+            timerInterval: null,
+            timeLeft: 15,
+            maxTime: 15,
+            difficulty: 'normal'
+        };
+
+        const masterChallengePool = [
+            {
+                title: 'Logika & Analisis',
+                question: 'Jika 3 kucing dapat menangkap 3 tikus dalam waktu 3 menit, berapa waktu yang dibutuhkan 100 kucing untuk menangkap 100 tikus?',
+                options: ['100 menit', '3 menit', '1 menit', '300 menit'],
+                correct: 1
+            },
+            {
+                title: 'Deret Angka Kilat',
+                question: 'Berapa angka selanjutnya dalam deret berikut: 2, 6, 12, 20, 30, ...?',
+                options: ['40', '42', '45', '48'],
+                correct: 1
+            },
+            {
+                title: 'Teka-Teki Asah Otak',
+                question: 'Benda apa yang jika dibalik justru akan bertambah berat?',
+                options: ['Kasur', 'Beban', 'Angka 6', 'Batu'],
+                correct: 2
+            },
+            {
+                title: 'Logika Silsilah',
+                question: 'Ayah Siti punya 5 anak: Kiki, Kaka, Kuku, Keke. Siapa nama anak kelima?',
+                options: ['Koko', 'Siti', 'Kiko', 'Kaku'],
+                correct: 1
+            },
+            {
+                title: 'Hitung Cepat Operasi',
+                question: 'Berapakah hasil dari 50 + 50 × 0 + 20 ?',
+                options: ['20', '70', '120', '0'],
+                correct: 1
+            },
+            {
+                title: 'Teka-Teki Ruang',
+                question: 'Kira-kira, lampu apa yang kalau dipecahkan justru keluar orangnya?',
+                options: ['Lampu neon', 'Lampu senter', 'Lampu pos ronda', 'Lampu petromak'],
+                correct: 2
+            },
+            {
+                title: 'Teka-Teki Waktu',
+                question: 'Bulan apa yang memiliki 28 hari dalam kalender masehi?',
+                options: ['Hanya bulan Februari', 'Semua bulan (Januari sampai Desember)', 'Bulan kabisat saja', 'Tidak ada'],
+                correct: 1
+            },
+            {
+                title: 'Logika Ruang Tamu',
+                question: 'Ada sebuah rumah satu lantai yang semua dindingnya menghadap ke selatan. Tiba-tiba ada beruang lewat di depan rumah. Apa warna beruang tersebut?',
+                options: ['Cokelat', 'Hitam', 'Putih (Beruang Kutub)', 'Abu-abu'],
+                correct: 2
+            }
+        ];
+
+        function startMindGameMenu() {
+            hideAllScreens();
+            document.getElementById('screenMindWelcome').classList.remove('hidden');
+        }
+
+        function launchMindGamePlay(difficulty) {
+            mindState.difficulty = difficulty;
+            mindState.lives = difficulty === 'hard' ? 2 : (difficulty === 'easy' ? 4 : 3);
+            mindState.score = 0;
+            mindState.streak = 0;
+            mindState.maxStreak = 0;
+            mindState.currentQuestionIndex = 0;
+            mindState.correctCount = 0;
+            mindState.maxTime = difficulty === 'hard' ? 10 : (difficulty === 'easy' ? 20 : 15);
+            mindState.questions = [...masterChallengePool].sort(() => Math.random() - 0.5);
+
+            hideAllScreens();
+            document.getElementById('screenMindGame').classList.remove('hidden');
+            document.getElementById('statsBar').classList.remove('hidden');
+
+            updateMindStats();
+            loadMindQuestion();
+        }
+
+        function updateMindStats() {
+            document.getElementById('statLives').innerText = mindState.lives;
+            document.getElementById('statScore').innerText = mindState.score;
+        }
+
+        function loadMindQuestion() {
+            if (mindState.currentQuestionIndex >= mindState.questions.length) {
+                endMindGame(true);
+                return;
+            }
+
+            const q = mindState.questions[mindState.currentQuestionIndex];
+            document.getElementById('gameModeTitle').innerText = q.title;
+            document.getElementById('gameProgress').innerText = `Soal ${mindState.currentQuestionIndex + 1} dari ${mindState.questions.length}`;
+            document.getElementById('questionText').innerText = q.question;
+            
+            document.getElementById('gameExtraArea').innerHTML = '';
+
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'p-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-cyber-500 rounded-2xl font-semibold text-slate-200 transition-all text-left flex items-center justify-between group transform hover:-translate-y-0.5 shadow-md';
+                btn.innerHTML = `<span class="pr-2">${opt}</span> <i class="fa-solid fa-chevron-right text-xs text-slate-600 group-hover:text-cyber-400 transition-colors"></i>`;
+                btn.onclick = () => checkMindAnswer(index, q.correct);
+                optionsGrid.appendChild(btn);
+            });
+
+            startMindTimer();
+        }
+
+        function startMindTimer() {
+            clearInterval(mindState.timerInterval);
+            mindState.timeLeft = mindState.maxTime;
+            const timerBar = document.getElementById('timerBar');
+            timerBar.style.width = '100%';
+
+            mindState.timerInterval = setInterval(() => {
+                mindState.timeLeft -= 0.1;
+                const percentage = (mindState.timeLeft / mindState.maxTime) * 100;
+                timerBar.style.width = `${Math.max(0, percentage)}%`;
+
+                if (mindState.timeLeft <= 0) {
+                    clearInterval(mindState.timerInterval);
+                    handleMindTimeout();
+                }
+            }, 100);
+        }
+
+        function handleMindTimeout() {
+            mindState.streak = 0;
+            mindState.lives--;
+            updateMindStats();
+            triggerShake();
+
+            if (mindState.lives <= 0) {
+                setTimeout(() => endMindGame(false), 1000);
+            } else {
+                mindState.currentQuestionIndex++;
+                setTimeout(loadMindQuestion, 1000);
+            }
+        }
+
+        function checkMindAnswer(selected, correct) {
+            clearInterval(mindState.timerInterval);
+            const options = document.getElementById('optionsGrid').children;
+            
+            for (let btn of options) {
+                btn.onclick = null;
+            }
+
+            const multiplier = mindState.difficulty === 'hard' ? 2 : (mindState.difficulty === 'easy' ? 1 : 1.5);
+
+            if (selected === correct) {
+                options[selected].classList.remove('bg-slate-950', 'border-slate-800');
+                options[selected].classList.add('bg-emerald-950/60', 'border-emerald-500', 'text-emerald-300', 'scale-[1.01]');
+                
+                mindState.streak++;
+                if (mindState.streak > mindState.maxStreak) mindState.maxStreak = mindState.streak;
+                
+                const bonus = Math.floor(mindState.timeLeft * 3) + (mindState.streak * 10);
+                mindState.score += Math.round((30 + bonus) * multiplier);
+                mindState.correctCount++;
+            } else {
+                options[selected].classList.remove('bg-slate-950', 'border-slate-800');
+                options[selected].classList.add('bg-pink-950/60', 'border-pink-500', 'text-pink-300');
+                options[correct].classList.remove('bg-slate-950', 'border-slate-800');
+                options[correct].classList.add('bg-emerald-950/60', 'border-emerald-500', 'text-emerald-300');
+                
+                mindState.streak = 0;
+                mindState.lives--;
+                triggerShake();
+            }
+
+            updateMindStats();
+
+            if (mindState.lives <= 0) {
+                setTimeout(() => endMindGame(false), 1200);
+            } else {
+                mindState.currentQuestionIndex++;
+                setTimeout(loadMindQuestion, 1200);
+            }
+        }
+
+        function triggerShake() {
+            const card = document.getElementById('gameCard');
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 400);
+        }
+
+        function endMindGame(isVictory) {
+            clearInterval(mindState.timerInterval);
+            hideAllScreens();
+            document.getElementById('gameCard').classList.remove('hidden');
+            document.getElementById('screenMindResult').classList.remove('hidden');
+
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDesc = document.getElementById('resultDesc');
+
+            if (isVictory) {
+                resultIcon.className = 'w-20 h-20 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-3xl mx-auto flex items-center justify-center text-4xl animate-bounce shadow-amber-500/20';
+                resultIcon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+                resultTitle.innerText = 'Luar Biasa! Otak Jenius!';
+                resultDesc.innerText = 'Anda berhasil menaklukkan seluruh tantangan dengan ketelitian tinggi.';
+            } else {
+                resultIcon.className = 'w-20 h-20 bg-pink-500/10 border border-pink-500/30 text-pink-400 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-pink-500/20';
+                resultIcon.innerHTML = '<i class="fa-solid fa-heart-crack"></i>';
+                resultTitle.innerText = 'Permainan Berakhir';
+                resultDesc.innerText = 'Nyawa atau waktu Anda habis. Ayo coba lagi dan lampaui skor terbaikmu!';
+            }
+
+            document.getElementById('finalScore').innerText = mindState.score;
+            document.getElementById('finalStreak').innerText = `${mindState.maxStreak}x`;
+            const accuracy = Math.round((mindState.correctCount / mindState.questions.length) * 100);
+            document.getElementById('finalAccuracy').innerText = `${accuracy}%`;
+        }
+
+
+        // ================= FISHING GAME LOGIC =================
+        let fishingState = {
+            totalFish: 0,
+            totalCoins: 0,
+            isFishing: false
+        };
+
+        const fishDatabase = [
+            { name: 'Ikan Lele Biasa', icon: 'fa-fish', rarity: 'Biasa', price: 1200, color: 'text-slate-300' },
+            { name: 'Ikan Mas Koki', icon: 'fa-fish-fins', rarity: 'Biasa', price: 1800, color: 'text-amber-400' },
+            { name: 'Ikan Nila Merah', icon: 'fa-fish', rarity: 'Menengah', price: 3500, color: 'text-pink-400' },
+            { name: 'Ikan Gurame Raksasa', icon: 'fa-fish-fins', rarity: 'Menengah', price: 6000, color: 'text-emerald-400' },
+            { name: 'Ikan Arwana Emas', icon: 'fa-fish', rarity: 'Langka', price: 18000, color: 'text-yellow-300' },
+            { name: 'Ikan Hiu Mini Megalodon', icon: 'fa-sharks', rarity: 'Langka', price: 32000, color: 'text-sky-400' },
+            { name: 'Peti Harta Karun Legendaris', icon: 'fa-box-open', rarity: 'Legendaris', price: 75000, color: 'text-purple-400' }
+        ];
+
+        function startFishingGame() {
+            hideAllScreens();
+            document.getElementById('screenFishingGame').classList.remove('hidden');
+            document.getElementById('fishStatsBar').classList.remove('hidden');
+            updateFishingStats();
+        }
+
+        function updateFishingStats() {
+            document.getElementById('statFishCount').innerText = `${fishingState.totalFish} Ekor`;
+            document.getElementById('statFishCoins').innerText = `Rp ${fishingState.totalCoins.toLocaleString('id-ID')}`;
+        }
+
+        function castFishingRod() {
+            if (fishingState.isFishing) return;
+            fishingState.isFishing = true;
+
+            const btnCast = document.getElementById('btnCast');
+            const statusText = document.getElementById('fishingStatusText');
+            const animArea = document.getElementById('fishingAnimationArea');
+
+            btnCast.disabled = true;
+            btnCast.classList.add('opacity-50', 'cursor-not-allowed');
+
+            animArea.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-ocean-400"></i>';
+            statusText.innerText = 'Kail dilempar ke dasar danau... Menunggu ikan menyambar umpan dengan sabar...';
+
+            setTimeout(() => {
+                animArea.innerHTML = '<i class="fa-solid fa-water-ladder text-amber-400 animate-bounce"></i>';
+                statusText.innerText = 'Ada sambaran kuat! Ikan tersangkut, segera menarik kail ke atas...';
+
+                setTimeout(() => {
+                    const caught = getRandomFish();
+                    fishingState.totalFish++;
+                    fishingState.totalCoins += caught.price;
+                    updateFishingStats();
+
+                    animArea.innerHTML = `<i class="fa-solid ${caught.icon} ${caught.color} animate-pulse"></i>`;
+                    statusText.innerText = `Berhasil mendapatkan ${caught.name}! (+Rp ${caught.price.toLocaleString('id-ID')})`;
+
+                    document.getElementById('lastCatchInfo').innerHTML = `
+                        <span class="font-bold ${caught.color}"><i class="fa-solid ${caught.icon} mr-1.5"></i> ${caught.name} (${caught.rarity})</span>
+                        <span class="text-amber-400 font-bold">+Rp ${caught.price.toLocaleString('id-ID')}</span>
+                    `;
+
+                    btnCast.disabled = false;
+                    btnCast.classList.remove('opacity-50', 'cursor-not-allowed');
+                    fishingState.isFishing = false;
+                }, 1400);
+
+            }, 2000);
+        }
+
+        function getRandomFish() {
+            const rand = Math.random() * 100;
+            let pool = [];
+            if (rand < 50) {
+                pool = fishDatabase.filter(f => f.rarity === 'Biasa');
+            } else if (rand < 80) {
+                pool = fishDatabase.filter(f => f.rarity === 'Menengah');
+            } else if (rand < 95) {
+                pool = fishDatabase.filter(f => f.rarity === 'Langka');
+            } else {
+                pool = fishDatabase.filter(f => f.rarity === 'Legendaris');
+            }
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+    </script>
+</body>
+</html>
